@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,6 +13,9 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
+
+import Image from 'next/image'
+import loginImage from "@/../public/images/undraw_secure-login_m11a.svg"
 
 const formSchema = z.object({
   username: z
@@ -48,15 +50,21 @@ export default function Login() {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
-    push('/dashboard')
+    push('/dashboard/2')
     // to-do: enviar session para backend e armazenar o cache no cookie
   }
 
   return (
-    <div>
-      <main>
+      <main className='mx-auto w-full p-4 flex flex-col items-center'>
+        <h3><strong>Bem Vindo!</strong> Faça login para visualizar suas tarefas </h3>
+        <Image
+        className='w-full max-w-sm m-8'
+          src={loginImage}
+          alt="Login"
+          width={300}
+          height={300}/>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 w-full max-w-sm">
             <FormField
               control={form.control}
               name="username"
@@ -66,9 +74,6 @@ export default function Login() {
                   <FormControl>
                     <Input placeholder="digite seu usuário" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    This is your public display name.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -78,21 +83,18 @@ export default function Login() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input placeholder="Digite sua senha" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    This is your public display name.
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Efetuar Login</Button>
+            <Button className='w-full'
+             type="submit">Efetuar Login</Button>
           </form>
         </Form>
       </main>
-    </div>
   )
 }
