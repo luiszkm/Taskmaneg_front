@@ -1,28 +1,26 @@
 import { HouseIcon, LogIn, Plus, Settings, UsersRoundIcon } from 'lucide-react'
 import Link from 'next/link'
+import Cookies from 'js-cookie'
+
 
 export function NavMenu() {
 
   function handleLogout() {
     // Do something when the user clicks on the logout button.
+    Cookies.remove('token');  
+    Cookies.remove('userId');
   }
 
   return (
     <nav className="w-full  ">
       <ul className="flex w-full justify-between px-5 items-center gap-4">
         <li className="hover:text-purple-500 hover:scale-x-90">
-          <Link className="flex items-center gap-1" href="/dashboard/2">
+          <Link className="flex items-center gap-1" href="/dashboard">
             <HouseIcon />
             <span className="hidden sm:block text-sm">DashBoard</span>
           </Link>
         </li>
-        <li className="hover:text-purple-500 hover:scale-x-90">
-          <Link className="flex items-center gap-1" href="/team">
-            <UsersRoundIcon />
-            <span className="hidden sm:block text-sm">Equipe</span>
-
-          </Link>
-        </li>
+      
         <li
           className="rounded-full  border bg-purple-500 p-2 scale-125 sm:scale-100
           sm:hover:text-purple-500 hover:scale-150
@@ -33,13 +31,7 @@ export function NavMenu() {
             <span className="hidden sm:block text-sm">Criar Tarefa</span>
           </Link>
         </li>
-         <li className="hover:text-purple-500 hover:scale-x-90 ">
-          <Link className="flex items-center gap-1" href="#">
-            <Settings />
-            <span className="hidden sm:block text-sm">configuração</span>
-
-          </Link>
-        </li>
+     
          <li className="hover:text-purple-500 hover:scale-x-90">
           <Link onClick={handleLogout}
           className="flex items-center gap-1" href="/login">

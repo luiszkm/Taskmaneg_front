@@ -25,9 +25,11 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import imageRegister from '@/../public/images/undraw_account_g3rf.svg'
-import { NavMenu } from '@/components/NavMenu'
 import { Header } from '@/components/Header'
 import { useRouter } from 'next/navigation'
+import { api } from '../api/axios'
+import Cookies from 'js-cookie'
+import { FooterMain } from '@/components/Footer'
 
 const FormSchema = z.object({
   category: z.string({
@@ -57,22 +59,47 @@ const FormSchema = z.object({
 
 export default function UserTask() {
   const { push } = useRouter()
+
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema)
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      category: '1',
+      description: '',
+      title: ''
+    }
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data)
-    push('/dashboard/2')
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    var userId = Cookies.get('userId')
+    var token = Cookies.get('token')
+    try {
+      const response = await api.post(
+        '/Task',
+        {
+          title: data.title,
+          description: data.description,
+          category: Number(data.category),
+          userId: userId
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      push(`/dashboard/${userId}`)
+    } catch (error) {}
   }
 
   return (
     <main className="flex w-full flex-col items-center justify-between h-screen">
-      <section className='w-full'>
+      <section className="w-full">
         <Header />
-        <h1 className="font-bold mt-4">Crie sua tarefa</h1>
-        <p>preecha o formulário abaixo para cadastrar uma nova tarefa</p>
-        <section className="flex sm:flex-row 5 items-center justify-between gap-4 ">
+        <div className='p-4'>
+          <h1 className="font-bold mt-4">Crie sua tarefa</h1>
+          <p>preecha o formulário abaixo para cadastrar uma nova tarefa</p>
+        </div>
+        <section className="flex flex-col p-4 sm:flex-row items-center justify-between gap-4 ">
           <Image
             className="w-full max-w-sm"
             src={imageRegister}
@@ -81,7 +108,7 @@ export default function UserTask() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="w-1/3 space-y-0 flex flex-col gap-2 text-sm"
+              className="sm:w-1/3 space-y-0 flex flex-col gap-2 text-sm w-full"
             >
               <FormField
                 control={form.control}
@@ -90,7 +117,7 @@ export default function UserTask() {
                   <FormItem>
                     <FormLabel>Titulo</FormLabel>
                     <FormControl>
-                      <Input placeholder="shadcn" {...field} />
+                      <Input placeholder="seu titulo " {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,7 +131,7 @@ export default function UserTask() {
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Tell us a little bit about yourself"
+                        placeholder="descrição"
                         className="resize-none"
                         {...field}
                       />
@@ -129,10 +156,10 @@ export default function UserTask() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="personal">Pessoal</SelectItem>
-                        <SelectItem value="work">Trabalho</SelectItem>
-                        <SelectItem value="lazer">Lazer</SelectItem>
-                        <SelectItem value="other">Outros</SelectItem>
+                        <SelectItem value="1">Pessoal</SelectItem>
+                        <SelectItem value="2">Trabalho</SelectItem>
+                        <SelectItem value="3">Estudos</SelectItem>
+                        <SelectItem value="4">Outros</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormItem>
@@ -143,8 +170,7 @@ export default function UserTask() {
           </Form>
         </section>
       </section>
-
-      <footer>aaaa</footer>
+      <div></div>
     </main>
   )
 }

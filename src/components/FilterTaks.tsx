@@ -14,57 +14,41 @@ import {
   FormMessage
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Checkbox } from './ui/checkbox'
-
+import { RadioGroup, RadioGroupItem } from './ui/radio-group'
 
 const formSchema = z.object({
-  username: z.string().default(''),
-  items: z.array(z.string()).default([])
+  username: z.string().nullable().optional(),
+  category: z.enum(['1', '2', '3', '4', '0']).nullable().optional()
 })
-
-const items = [
-  {
-    id: 'personal',
-    label: 'Pessoal'
-  },
-  {
-    id: 'work',
-    label: 'Trabalho'
-  },
-  {
-    id: 'lazer',
-    label: 'Lazer'
-  },
-  {
-    id: 'others',
-    label: 'Outros'
-  }
-] as const
 
 type FilterTasksProps = {
   isOpen: boolean
+  onSubmitValues: (values: z.infer<typeof formSchema>) => void;
 }
 
-export function FilterTasks({isOpen}: FilterTasksProps) {
+export function FilterTasks({ isOpen, onSubmitValues }: FilterTasksProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
-      items: []
+      username: null,
+      category: null
     }
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+   console.log(values.category)
+    Number(values.category)=== 0 ? values.category = null : values.category
+    
+    onSubmitValues(values)
   }
   return (
-    <div className='flex items-center gap-5 mt-4'>
-      
+    <div className="flex items-center gap-5 mt-4">
       {isOpen ? (
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-center gap-2 ">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col sm:flex-row items-center gap-2 "
+          >
             <FormField
               control={form.control}
               name="username"
@@ -74,6 +58,7 @@ export function FilterTasks({isOpen}: FilterTasksProps) {
                     <Input
                       placeholder="nome do usuário"
                       {...field}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
 
@@ -82,52 +67,53 @@ export function FilterTasks({isOpen}: FilterTasksProps) {
               )}
             />
             <FormField
-            
               control={form.control}
-              name="items"
-              render={() => (
-                <FormItem className='flex items-center gap-2'>
-                  <div className="">
-                    <FormLabel className="text-base font-bold">Categorias</FormLabel>
-                  </div>
-                  {items.map(item => (
-                    <FormField 
-                      key={item.id}
-                      control={form.control}
-                      name="items"
-                      render={({ field }) => {
-                        return (
-                          <FormItem
-                            key={item.id}
-                            className="flex flex-row items-start space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(item.id)}
-                                onCheckedChange={checked => {
-                                  return checked
-                                    ? field.onChange([...field.value, item.id])
-                                    : field.onChange(
-                                        field.value?.filter(
-                                          value => value !== item.id
-                                        )
-                                      )
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="text-sm font-normal">
-                              {item.label}
-                            </FormLabel>
-                          </FormItem>
-                        )
-                      }}
-                    />
-                  ))}
+              name="category"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value ?? undefined}
+                      className="grid grid-cols-3  items-center gap-2"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="1" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Pessoal</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="2" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Trabalho</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="3" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Estudos</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="4" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Outros</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="0" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Todos</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">Aplicar filtros</Button>
+            <Button type="submit">Aplicar</Button>
           </form>
         </Form>
       ) : null}

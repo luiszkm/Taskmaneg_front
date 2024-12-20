@@ -1,7 +1,7 @@
 
 export enum CategoriesEnum {
-  'personal' = 0,
-  'work' = 1,
-  'fit' = 2,
-  'other' = 3
+  'Pessoal' = 1,
+  'Trabalho' = 2,
+  'Estudos' = 3,
+  'Outros' = 4
 }

@@ -1,11 +1,13 @@
 import { Progress } from '@/components/ui/progress'
 
 type ProgressProps = {
+  title: string
   totalTasks: number
   completedTasks: number
 }
 
 export function TaskProgress({
+  title,
   completedTasks,
   totalTasks
 }: ProgressProps) {
@@ -14,7 +16,7 @@ export function TaskProgress({
 
   return (
     <div className=' border rounded-xl shadow-lg p-2'>
-      <strong>Suas tarefas</strong>
+      <strong>{title}</strong>
       <span>{`${totalTasks}/${completedTasks}`}</span>
       <Progress title={`${progressPercent.toFixed(1)}%`}
        value={progressPercent} />

@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
 import wellcomeImage from '@/../public/images/undraw_welcome_nk8k.svg'
 import Image from 'next/image'
+import { api } from '../api/axios'
 const formSchema: z.ZodSchema = z
   .object({
     username: z
@@ -57,78 +58,85 @@ export default function Register() {
       passwordConfirm: ''
     }
   })
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values)
+    const response = await api.post('/User', {
+      username: values.username,
+      password: values.password
+    })
     push('/login')
-    // to-do: enviar session para backend e armazenar o cache no cookie
+    return response.data
   }
 
   return (
-    <main className="p-4 flex flex-col items-center ">
-      <h4>Seja Bem vindo!! Preencha o formulário abaixo para se cadastrar </h4>
-      <div className="flex flex-col sm:flex-row mt-8 gap-3 sm:gap-8 sm:mt-20 items-center">
-        <Image
-          className="w-full max-w-sm mb-4"
-          src={wellcomeImage}
-          alt="Bem vindo"
-          width={300}
-          height={300}
-        />
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-2 max-w-sm"
-          >
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Usuário</FormLabel>
-                  <FormControl>
-                    <Input placeholder="digite seu usuário" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Senha</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Digite sua senha" {...field} />
-                  </FormControl>
+    <main className="p-4 flex flex-col items-center justify-between h-screen ">
+      <section  className="p-4 flex flex-col items-center ">
+        <h4 className='text-lg'>
+          Seja Bem vindo!! Preencha o formulário abaixo para se cadastrar{' '}
+        </h4>
+        <div className="flex flex-col sm:flex-row mt-8 gap-3 sm:gap-8 sm:mt-20 items-center">
+          <Image
+            className="w-full max-w-sm mb-4"
+            src={wellcomeImage}
+            alt="Bem vindo"
+            width={300}
+            height={300}
+          />
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-2 max-w-sm"
+            >
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Usuário</FormLabel>
+                    <FormControl>
+                      <Input placeholder="digite seu usuário" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Senha</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Digite sua senha" {...field} />
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="passwordConfirm"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirme sua senha</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Confirme sua senha" {...field} />
-                  </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="passwordConfirm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirme sua senha</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Confirme sua senha" {...field} />
+                    </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button className="w-full" type="submit">
-              Registrar
-            </Button>
-          </form>
-        </Form>
-      </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button className="w-full" type="submit">
+                Registrar
+              </Button>
+            </form>
+          </Form>
+        </div>
+      </section>
     </main>
   )
 }

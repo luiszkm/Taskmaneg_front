@@ -11,7 +11,6 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog'
 import { Button } from './ui/button'
-import { useRouter } from 'next/navigation'
 import {
   BookmarkCheckIcon,
   CheckCheckIcon,
@@ -22,18 +21,24 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { api } from '@/app/api/axios'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
+import { CategoriesEnum } from '@/utils/categoriesEnum'
 
 type UserTaskProps = {
+  category: number
   id: string
   title: string
   description: string
   status: boolean
-  createdAt: Date
-  completedAt: Date
+  createdAt: string
+  completedAt: string
 }
 
 export function UserTask({
   id,
+  category,
   title,
   description,
   status,
@@ -42,24 +47,41 @@ export function UserTask({
 }: UserTaskProps) {
   const { push } = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-  function handleDeleteTask() {
-    console.log('deletar tarefa')
+  var token = Cookies.get('token')
+  async function handleDeleteTask() {
+    try {
+      const response = await api.delete(`/Task/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      push(`/dashboard`)
+    } catch (error) {}
+  }
+  
+  async function handleCompleteTask() {
+    try {
+      const response = await api.patch(`/Task/changestatus`,
+        {
+          taskId: id,
+          completed: !status
+        }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      console.log(response.data.data)
+      push(`/dashboard`)
+    } catch (error) {}
   }
 
-  function handleUpdateTask() {
-    push(`/task/${id}`)
-  }
-
-  function convertDate(date: Date) {
-    return date.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
+  function convertDate(date: string) {
+    const newDate = new Date(date)
+    return newDate.toLocaleDateString()
   }
 
   return (
-    <div className="border px-2 rounded-2xl w-full max-w-96 shadow-lg bg">
+    <div className="border px-2 rounded-2xl w-full shadow-lg bg">
       <div className="flex justify-between items-center mt-2">
         <strong>{title}</strong>
         <div className="flex gap-2 items-center ">
@@ -93,24 +115,23 @@ export function UserTask({
       </div>
 
       {isOpen ? (
-        <p className="overflow-auto max-h-32 text-sm">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem
-          repudiandae alias necessitatibus totam hic doloremque ex et iusto
-          harum exercitationem numquam, dolor quod, ea facere minima minus odit?
-          Iure, repudiandae.
-        </p>
+        <p className="overflow-auto max-h-32 text-sm">{description}</p>
       ) : null}
+      <small className="border  rounded-full px-1">
+        {CategoriesEnum[category]}
+      </small>
 
       {status ? (
         <div className="flex justify-between ">
-          <small>Concluída</small>
-          <small>{convertDate(completedAt)}</small>
+          <small className='bg-green-200 text-green-900 rounded-2xl px-2'>Concluída</small>
+          <small>concluída em {convertDate(completedAt)}</small>
         </div>
       ) : (
         <div className="flex justify-between items-center">
           <small>{convertDate(createdAt)}</small>
-          <small className="text-yellow-500">Pendente</small>
-          <Button className=" flex items-center gap-1 max-h-fit p-1 text-xs">
+          <small className="text-yellow-900 bg-yellow-200 rounded-2xl px-2">Pendente</small>
+          <Button onClick={handleCompleteTask}
+          className=" flex items-center gap-1 max-h-fit p-1 text-xs">
             <BookmarkCheckIcon />
             concluir tarefa
           </Button>
